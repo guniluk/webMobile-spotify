@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { user } from "../controllers/user.controller.js";
+import { song } from "../controllers/song.controller.js";
 
 const router = Router();
 
-router.get("/", user);
+router.get("/", song);
 
 export default router;

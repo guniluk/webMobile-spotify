@@ -6,6 +6,11 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { connectDB } from "./db/connectDB.js";
 import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
+import adminRoutes from "./routes/admin.route.js";
+import songRoutes from "./routes/song.route.js";
+import albumRoutes from "./routes/album.route.js";
+import statRoutes from "./routes/stat.route.js";
 
 // 필수 환경변수 검사
 if (!process.env.CLERK_PUBLISHABLE_KEY || !process.env.CLERK_SECRET_KEY) {
@@ -56,7 +61,12 @@ io.use(async (socket, next) => {
 });
 
 // routes
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/songs", songRoutes);
+app.use("/api/albums", albumRoutes);
+app.use("/api/stats", statRoutes);
 
 // 테스트 라우트 (Clerk 검증 포함)
 app.get("/", (req, res) => {
@@ -82,7 +92,7 @@ io.on("connection", (socket) => {
 });
 
 // 데이터베이스 연결, 서버 시작
-httpServer.listen(port, async () => {
-  await connectDB();
+httpServer.listen(port, () => {
+  connectDB();
   console.log(`✅ Server is running on port ${port}`);
 });
