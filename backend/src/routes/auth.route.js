@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { auth } from "../controllers/auth.controller.js";
+import { Router } from 'express';
+import { authCallback } from '../controllers/auth.controller.js';
 
 const router = Router();
 
-router.get("/", auth);
+router.post('/callback', authCallback);
 
 export default router;
