@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { axiosInstance } from '@/lib/axios';
-import axios from 'axios';
+import { create } from "zustand";
+import { axiosInstance } from "@/lib/axios";
+import axios from "axios";
 
 export interface User {
   _id: string;
@@ -56,10 +56,10 @@ export const useChatStore = create<ChatStore>((set) => ({
   fetchUsers: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.get('/users');
+      const response = await axiosInstance.get("/users");
       set({ users: response.data });
     } catch (error) {
-      set({ error: getErrorMessage(error, 'Failed to fetch users') });
+      set({ error: getErrorMessage(error, "Failed to fetch users") });
     } finally {
       set({ isLoading: false });
     }
@@ -71,7 +71,7 @@ export const useChatStore = create<ChatStore>((set) => ({
       const response = await axiosInstance.get(`/users/messages/${userId}`);
       set({ messages: response.data });
     } catch (error) {
-      set({ error: getErrorMessage(error, 'Failed to fetch messages') });
+      set({ error: getErrorMessage(error, "Failed to fetch messages") });
     } finally {
       set({ isLoading: false });
     }
@@ -79,12 +79,15 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   sendMessage: async (receiverId: string, content: string) => {
     try {
-      const response = await axiosInstance.post(`/users/messages/${receiverId}`, { content });
+      const response = await axiosInstance.post(
+        `/users/messages/${receiverId}`,
+        { content },
+      );
       set((state) => ({
         messages: [...state.messages, response.data],
       }));
     } catch (error) {
-      set({ error: getErrorMessage(error, 'Failed to send message') });
+      set({ error: getErrorMessage(error, "Failed to send message") });
     }
   },
 

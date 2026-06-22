@@ -8,13 +8,12 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 import { useAuth } from '@clerk/react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useMusicStore } from '@/store/useMusicStore';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const LeftSidebar = () => {
   const { albums, fetchAlbums, isLoading } = useMusicStore();
-  const { isAdmin, checkAdminStatus } = useAuthStore();
+  const { isAdmin, checkAdminStatus, reset } = useAuthStore();
   const { isLoaded, isSignedIn } = useAuth();
   const location = useLocation();
 
@@ -23,10 +22,16 @@ const LeftSidebar = () => {
   }, [fetchAlbums]);
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      checkAdminStatus();
+    if (isLoaded) {
+      if (isSignedIn) {
+        if (!isAdmin) {
+          checkAdminStatus();
+        }
+      } else {
+        reset();
+      }
     }
-  }, [isLoaded, isSignedIn, checkAdminStatus]);
+  }, [isLoaded, isSignedIn, isAdmin, checkAdminStatus, reset]);
 
   return (
     <div className="h-full flex flex-col gap-2">
@@ -81,11 +86,11 @@ const LeftSidebar = () => {
         </div>
 
         {/* Album List / Scroll Area */}
-        <ScrollArea className="flex-1">
-          <div className="space-y-2 pr-4">
+        <div className="flex-1 overflow-y-auto pr-1 select-none scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+          <div className="space-y-2">
             {isLoading ? (
               // Skeleton Loading
-              Array.from({ length: 4 }).map((_, i) => (
+              Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-3 p-2 rounded-md justify-center md:justify-start"
@@ -136,7 +141,7 @@ const LeftSidebar = () => {
               ))
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

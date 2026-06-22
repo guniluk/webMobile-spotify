@@ -19,7 +19,7 @@ interface PlayerStore {
 }
 
 // Singleton Audio Instance for browser
-const audio = typeof window !== 'undefined' ? new Audio() : null;
+export const audio = typeof window !== 'undefined' ? new Audio() : null;
 
 export const usePlayerStore = create<PlayerStore>((set, get) => {
   // Listen for song ending to play the next one automatically
@@ -49,7 +49,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
 
       const isSameSong = get().currentSong?._id === song._id;
       
-      if (isSameSong) {
+      if (isSameSong && audio.src) {
         get().togglePlay();
         return;
       }

@@ -6,9 +6,13 @@ import {
 import { Outlet } from 'react-router-dom';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
+import { usePlayerStore } from '@/store/usePlayerStore';
+import PlaybackControls from '@/components/PlaybackControls';
 
 const MainLayout = () => {
   const isMobile = false;
+  const { currentSong } = usePlayerStore();
+
   return (
     <div className="h-screen flex flex-col bg-black text-white p-2">
       <ResizablePanelGroup
@@ -45,6 +49,8 @@ const MainLayout = () => {
           <RightSidebar />
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {currentSong && <PlaybackControls />}
     </div>
   );
 };
