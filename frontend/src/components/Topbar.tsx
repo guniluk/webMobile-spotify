@@ -1,28 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { LayoutDashboardIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Show, useAuth, useUser } from "@clerk/react";
 import SignInOAuthButtons from "./SignInOAuthButtons";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const Topbar = () => {
-  const { isLoaded, isSignedIn, signOut } = useAuth();
+  const { signOut } = useAuth();
   const { user } = useUser();
-  const { isAdmin, checkAdminStatus, reset } = useAuthStore();
+  const { isAdmin } = useAuthStore();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  useEffect(() => {
-    if (isLoaded) {
-      if (isSignedIn) {
-        if (!isAdmin) {
-          checkAdminStatus();
-        }
-      } else {
-        reset();
-      }
-    }
-  }, [isLoaded, isSignedIn, isAdmin, checkAdminStatus, reset]);
+  const location = useLocation();
 
   return (
     <div className="flex items-center justify-between p-4 sticky top-0 backdrop-blur-md bg-zinc-900/75 z-10">
@@ -34,7 +23,7 @@ const Topbar = () => {
       </div>
       <div className="flex items-center gap-4">
         <Show when="signed-in">
-          {isAdmin && (
+          {isAdmin && location.pathname !== "/admin" && (
             <Link
               to="/admin"
               className="flex items-center gap-2 text-sm hover:text-green-500 transition-colors cursor-pointer mr-2"

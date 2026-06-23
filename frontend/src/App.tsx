@@ -5,6 +5,7 @@ import MainLayout from "./layout/MainLayout";
 import HomePage from "./pages/Home";
 import ChatPage from "./pages/ChatPage";
 import AlbumPage from "./pages/AlbumPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/albums/:albumId" element={<AlbumPage />} />
         </Route>
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </>
   );

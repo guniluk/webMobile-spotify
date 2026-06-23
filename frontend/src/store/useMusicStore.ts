@@ -25,6 +25,13 @@ export interface Album {
   updatedAt: Date;
 }
 
+export interface Stats {
+  totalSongs: number;
+  totalAlbums: number;
+  totalUsers: number;
+  uniqueArtists: number;
+}
+
 interface MusicStore {
   songs: Song[];
   albums: Album[];
@@ -32,6 +39,7 @@ interface MusicStore {
   madeForYouSongs: Song[];
   trendingSongs: Song[];
   currentAlbum: Album | null;
+  stats: Stats | null;
   isLoading: boolean;
   error: string | null;
 
@@ -43,6 +51,9 @@ interface MusicStore {
   fetchTrendingSongs: () => Promise<void>;
   deleteSong: (id: string) => Promise<void>;
   deleteAlbum: (id: string) => Promise<void>;
+  fetchStats: () => Promise<void>;
+  createSong: (formData: FormData) => Promise<void>;
+  createAlbum: (formData: FormData) => Promise<void>;
 }
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
@@ -62,6 +73,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
   madeForYouSongs: [],
   trendingSongs: [],
   currentAlbum: null,
+  stats: null,
   isLoading: false,
   error: null,
 
@@ -156,13 +168,63 @@ export const useMusicStore = create<MusicStore>((set) => ({
   deleteAlbum: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      await axiosInstance.delete(`/admin/albums/${id}`);
+      await axiosInstance.delete(`/admin/album/${id}`);
       set((state) => ({
         albums: state.albums.filter((album) => album._id !== id),
         songs: state.songs.filter((song) => song.albumId !== id),
       }));
     } catch (error) {
       set({ error: getErrorMessage(error, "Failed to delete album") });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchStats: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.get("/stats");
+      set({ stats: response.data });
+    } catch (error) {
+      set({ error: getErrorMessage(error, "Failed to fetch stats") });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  createSong: async (formData: FormData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.post("/admin/songs", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      set((state) => ({
+        songs: [...state.songs, response.data],
+      }));
+    } catch (error) {
+      set({ error: getErrorMessage(error, "Failed to create song") });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  createAlbum: async (formData: FormData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.post("/admin/album", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      set((state) => ({
+        albums: [...state.albums, response.data],
+      }));
+    } catch (error) {
+      set({ error: getErrorMessage(error, "Failed to create album") });
+      throw error;
     } finally {
       set({ isLoading: false });
     }

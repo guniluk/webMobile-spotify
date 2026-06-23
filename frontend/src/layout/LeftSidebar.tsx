@@ -13,25 +13,13 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 const LeftSidebar = () => {
   const { albums, fetchAlbums, isLoading } = useMusicStore();
-  const { isAdmin, checkAdminStatus, reset } = useAuthStore();
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { isAdmin } = useAuthStore();
   const location = useLocation();
 
   useEffect(() => {
     fetchAlbums();
   }, [fetchAlbums]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      if (isSignedIn) {
-        if (!isAdmin) {
-          checkAdminStatus();
-        }
-      } else {
-        reset();
-      }
-    }
-  }, [isLoaded, isSignedIn, isAdmin, checkAdminStatus, reset]);
 
   return (
     <div className="h-full flex flex-col gap-2">

@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import type { Song } from './useMusicStore';
+import { create } from "zustand";
+import type { Song } from "./useMusicStore";
 
 interface PlayerStore {
   currentSong: Song | null;
@@ -7,6 +7,8 @@ interface PlayerStore {
   queue: Song[];
   currentIndex: number;
   volume: number;
+  isShuffle: boolean;
+  isRepeat: boolean;
 
   initializeQueue: (songs: Song[]) => void;
   playSong: (song: Song) => void;
@@ -16,15 +18,17 @@ interface PlayerStore {
   setQueue: (songs: Song[]) => void;
   setCurrentSong: (song: Song | null) => void;
   setVolume: (volume: number) => void;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
 }
 
 // Singleton Audio Instance for browser
-export const audio = typeof window !== 'undefined' ? new Audio() : null;
+export const audio = typeof window !== "undefined" ? new Audio() : null;
 
 export const usePlayerStore = create<PlayerStore>((set, get) => {
   // Listen for song ending to play the next one automatically
   if (audio) {
-    audio.addEventListener('ended', () => {
+    audio.addEventListener("ended", () => {
       get().playNext();
     });
   }
@@ -35,6 +39,24 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
     queue: [],
     currentIndex: -1,
     volume: 0.5, // Default volume: 50%
+    isShuffle: true, // Default: shuffle enabled
+    isRepeat: false,
+
+    toggleShuffle: () => {
+      const { isShuffle } = get();
+      set({
+        isShuffle: !isShuffle,
+        isRepeat: !isShuffle ? false : get().isRepeat,
+      });
+    },
+
+    toggleRepeat: () => {
+      const { isRepeat } = get();
+      set({
+        isRepeat: !isRepeat,
+        isShuffle: !isRepeat ? false : get().isShuffle,
+      });
+    },
 
     initializeQueue: (songs: Song[]) => {
       set({
@@ -48,7 +70,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
       if (!audio) return;
 
       const isSameSong = get().currentSong?._id === song._id;
-      
+
       if (isSameSong && audio.src) {
         get().togglePlay();
         return;
@@ -56,8 +78,9 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
 
       audio.src = song.audioUrl;
       audio.volume = get().volume;
-      
-      audio.play()
+
+      audio
+        .play()
         .then(() => {
           const index = get().queue.findIndex((s) => s._id === song._id);
           set({
@@ -67,7 +90,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
           });
         })
         .catch((error) => {
-          console.error('Playback error:', error);
+          console.error("Playback error:", error);
           set({ isPlaying: false });
         });
     },
@@ -79,38 +102,63 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
         audio.pause();
         set({ isPlaying: false });
       } else {
-        audio.play()
+        audio
+          .play()
           .then(() => {
             set({ isPlaying: true });
           })
           .catch((error) => {
-            console.error('Play resumption error:', error);
+            console.error("Play resumption error:", error);
           });
       }
     },
 
     playNext: () => {
-      const { queue, currentIndex } = get();
+      const { queue, currentIndex, isShuffle } = get();
       if (queue.length === 0) return;
 
-      const nextIndex = (currentIndex + 1) % queue.length;
-      const nextSong = queue[nextIndex];
-
-      if (nextSong) {
-        get().playSong(nextSong);
+      if (isShuffle && queue.length > 1) {
+        let nextIndex = currentIndex;
+        let attempts = 0;
+        while (nextIndex === currentIndex && attempts < 10) {
+          nextIndex = Math.floor(Math.random() * queue.length);
+          attempts++;
+        }
+        const nextSong = queue[nextIndex];
+        if (nextSong) {
+          get().playSong(nextSong);
+        }
+      } else {
+        const nextIndex = (currentIndex + 1) % queue.length;
+        const nextSong = queue[nextIndex];
+        if (nextSong) {
+          get().playSong(nextSong);
+        }
       }
     },
 
     playPrevious: () => {
-      const { queue, currentIndex } = get();
+      const { queue, currentIndex, isShuffle } = get();
       if (queue.length === 0) return;
 
-      // If playing the first song, wrap around to the last song
-      const prevIndex = currentIndex - 1 < 0 ? queue.length - 1 : currentIndex - 1;
-      const prevSong = queue[prevIndex];
-
-      if (prevSong) {
-        get().playSong(prevSong);
+      if (isShuffle && queue.length > 1) {
+        let prevIndex = currentIndex;
+        let attempts = 0;
+        while (prevIndex === currentIndex && attempts < 10) {
+          prevIndex = Math.floor(Math.random() * queue.length);
+          attempts++;
+        }
+        const prevSong = queue[prevIndex];
+        if (prevSong) {
+          get().playSong(prevSong);
+        }
+      } else {
+        const prevIndex =
+          currentIndex - 1 < 0 ? queue.length - 1 : currentIndex - 1;
+        const prevSong = queue[prevIndex];
+        if (prevSong) {
+          get().playSong(prevSong);
+        }
       }
     },
 

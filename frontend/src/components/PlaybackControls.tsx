@@ -20,49 +20,89 @@ export const PlaybackControls = () => {
     playPrevious,
     volume,
     setVolume,
+    isShuffle,
+    isRepeat,
+    toggleShuffle,
+    toggleRepeat,
   } = usePlayerStore();
 
   const [currentTime, setCurrentTime] = useState(audio ? audio.currentTime : 0);
-  const [duration, setDuration] = useState(audio ? audio.duration || 0 : 0);
+  const [duration, setDuration] = useState(
+    audio ? audio.duration || currentSong?.duration || 0 : currentSong?.duration || 0
+  );
+  const [prevSongId, setPrevSongId] = useState(currentSong?._id);
   const [isMuted, setIsMuted] = useState(false);
+  const isDraggingRef = useRef(false);
   const prevVolumeRef = useRef(volume);
+
+  // Synchronously reset to new song values during render phase when song changes (prevents ESLint warning & cascading effect runs)
+  if (currentSong?._id !== prevSongId) {
+    setPrevSongId(currentSong?._id);
+    setCurrentTime(0);
+    setDuration(currentSong?.duration || 0);
+  }
 
   useEffect(() => {
     if (!audio) return;
 
     const audioElement = audio;
 
+    // Asynchronously sync with actual audio element states to avoid cascading renders warning
+    const timeoutId = setTimeout(() => {
+      if (!isNaN(audioElement.currentTime)) {
+        setCurrentTime(audioElement.currentTime);
+      }
+      if (audioElement.duration && !isNaN(audioElement.duration)) {
+        setDuration(audioElement.duration);
+      }
+    }, 0);
+
     const handleTimeUpdate = () => {
-      setCurrentTime(audioElement.currentTime);
+      if (!isDraggingRef.current) {
+        setCurrentTime(audioElement.currentTime);
+      }
     };
 
-    const handleLoadedMetadata = () => {
-      setDuration(audioElement.duration || 0);
+    const handleDurationChange = () => {
+      if (audioElement.duration && !isNaN(audioElement.duration)) {
+        setDuration(audioElement.duration);
+      }
     };
 
     audioElement.addEventListener("timeupdate", handleTimeUpdate);
-    audioElement.addEventListener("loadedmetadata", handleLoadedMetadata);
-
-    // Initial state Sync asynchronously to avoid cascading renders warning
-    const timeoutId = setTimeout(() => {
-      setCurrentTime(audioElement.currentTime);
-      setDuration(audioElement.duration || 0);
-    }, 0);
+    audioElement.addEventListener("loadedmetadata", handleDurationChange);
+    audioElement.addEventListener("durationchange", handleDurationChange);
 
     return () => {
       clearTimeout(timeoutId);
       audioElement.removeEventListener("timeupdate", handleTimeUpdate);
-      audioElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audioElement.removeEventListener("loadedmetadata", handleDurationChange);
+      audioElement.removeEventListener("durationchange", handleDurationChange);
     };
   }, [currentSong]);
 
   if (!currentSong) return null;
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audio) return;
+  const handleSeekStart = () => {
+    isDraggingRef.current = true;
+  };
+
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (!isDraggingRef.current && audio) {
+      audio.currentTime = newTime;
+    }
+  };
+
+  const handleSeekEnd = (
+    e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>
+  ) => {
+    if (!audio) return;
+    const newTime = parseFloat((e.target as HTMLInputElement).value);
     audio.currentTime = newTime;
     setCurrentTime(newTime);
+    isDraggingRef.current = false;
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +130,15 @@ export const PlaybackControls = () => {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  const maxTime = duration || currentSong?.duration || 100;
+  const progressPercentage =
+    maxTime > 0 && !isNaN(currentTime) && !isNaN(maxTime)
+      ? (currentTime / maxTime) * 100
+      : 0;
+
+  const currentVolume = isMuted ? 0 : volume;
+  const volumePercentage = currentVolume * 100;
+
   return (
     <div className="w-full bg-[#121212] border-t border-white/10 px-4 py-3 md:py-4 flex flex-col md:grid md:grid-cols-3 items-center justify-between gap-3 md:gap-0 rounded-lg mt-2">
       {/* Left side - Track Info */}
@@ -113,7 +162,14 @@ export const PlaybackControls = () => {
       <div className="flex flex-col items-center gap-2 w-full max-w-140 mx-auto">
         {/* Buttons */}
         <div className="flex items-center gap-4 md:gap-6">
-          <button className="text-neutral-400 hover:text-white transition-colors cursor-pointer hidden md:block">
+          <button
+            onClick={toggleShuffle}
+            className={`transition-colors cursor-pointer hidden md:block ${
+              isShuffle
+                ? "text-green-500 hover:text-green-400"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
             <Shuffle className="w-4 h-4" />
           </button>
 
@@ -142,7 +198,14 @@ export const PlaybackControls = () => {
             <SkipForward className="w-5 h-5 fill-current" />
           </button>
 
-          <button className="text-neutral-400 hover:text-white transition-colors cursor-pointer hidden md:block">
+          <button
+            onClick={toggleRepeat}
+            className={`transition-colors cursor-pointer hidden md:block ${
+              isRepeat
+                ? "text-green-500 hover:text-green-400"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
             <Repeat className="w-4 h-4" />
           </button>
         </div>
@@ -153,13 +216,20 @@ export const PlaybackControls = () => {
           <input
             type="range"
             min={0}
-            max={duration || currentSong.duration || 100}
+            max={maxTime}
             value={currentTime}
-            onChange={handleSeek}
-            className="w-full h-1 bg-neutral-600 rounded-full appearance-none cursor-pointer hover:bg-neutral-500 accent-green-500 [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:opacity-0 [&:hover::-webkit-slider-thumb]:opacity-100 transition-all"
+            onMouseDown={handleSeekStart}
+            onTouchStart={handleSeekStart}
+            onChange={handleSeekChange}
+            onMouseUp={handleSeekEnd}
+            onTouchEnd={handleSeekEnd}
+            className="w-full h-1 rounded-full appearance-none cursor-pointer accent-green-500 [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:opacity-0 [&:hover::-webkit-slider-thumb]:opacity-100 transition-all"
+            style={{
+              background: `linear-gradient(to right, #1db954 0%, #1db954 ${progressPercentage}%, #4d4d4d ${progressPercentage}%, #4d4d4d 100%)`,
+            }}
           />
           <span className="w-8 text-left">
-            {formatTime(duration || currentSong.duration)}
+            {formatTime(maxTime)}
           </span>
         </div>
       </div>
@@ -181,9 +251,12 @@ export const PlaybackControls = () => {
           min={0}
           max={1}
           step={0.01}
-          value={isMuted ? 0 : volume}
+          value={currentVolume}
           onChange={handleVolumeChange}
-          className="w-20 md:w-24 h-1 bg-neutral-600 rounded-full appearance-none cursor-pointer hover:bg-neutral-500 accent-green-500 [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:opacity-0 [&:hover::-webkit-slider-thumb]:opacity-100 transition-all"
+          className="w-20 md:w-24 h-1 rounded-full appearance-none cursor-pointer accent-green-500 [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:opacity-0 [&:hover::-webkit-slider-thumb]:opacity-100 transition-all"
+          style={{
+            background: `linear-gradient(to right, #1db954 0%, #1db954 ${volumePercentage}%, #4d4d4d ${volumePercentage}%, #4d4d4d 100%)`,
+          }}
         />
       </div>
     </div>

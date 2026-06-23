@@ -1,35 +1,54 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/react';
 import { axiosInstance } from '@/lib/axios';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Loader } from 'lucide-react';
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { getToken, userId } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { checkAdminStatus, reset } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
-  const updateApiToken = (token: string | null) => {
-    if (token) {
-      axiosInstance.defaults.headers.common['Authorization'] =
-        `Bearer ${token}`;
-    } else {
-      delete axiosInstance.defaults.headers.common['Authorization'];
-    }
-  };
+  useEffect(() => {
+    const requestInterceptor = axiosInstance.interceptors.request.use(
+      async (config) => {
+        try {
+          const token = await getToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch (error) {
+          console.error('Error setting auth token:', error);
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axiosInstance.interceptors.request.eject(requestInterceptor);
+    };
+  }, [getToken]);
 
   useEffect(() => {
     const initAuth = async () => {
-      try {
-        const token = await getToken();
-        updateApiToken(token);
-      } catch (err) {
-        updateApiToken(null);
-        console.error('Error getting token:', err);
-      } finally {
+      if (isLoaded) {
+        if (isSignedIn) {
+          try {
+            await checkAdminStatus();
+          } catch (error) {
+            console.error('Error checking admin status:', error);
+          }
+        } else {
+          reset();
+        }
         setLoading(false);
       }
     };
     initAuth();
-  }, [getToken, userId]);
+  }, [isLoaded, isSignedIn, checkAdminStatus, reset]);
 
   if (loading)
     return (
