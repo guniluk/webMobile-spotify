@@ -95,8 +95,9 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
       setImageFile(null);
       setAudioFile(null);
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "노래 추가에 실패했습니다.");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || "노래 추가에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }

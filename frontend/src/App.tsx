@@ -6,8 +6,13 @@ import HomePage from "./pages/Home";
 import ChatPage from "./pages/ChatPage";
 import AlbumPage from "./pages/AlbumPage";
 import AdminPage from "./pages/AdminPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import { useSocketSync } from "./hooks/useSocketSync";
 
 function App() {
+  // 전역 소켓 연결 및 음악 재생 실시간 상태 동기화 훅 호출
+  useSocketSync();
+
   return (
     <>
       <Routes>
@@ -24,6 +29,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/albums/:albumId" element={<AlbumPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="/admin" element={<AdminPage />} />
       </Routes>

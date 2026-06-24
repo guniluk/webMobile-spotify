@@ -1,6 +1,7 @@
 import { Song } from '../models/song.model.js';
 import { Album } from '../models/album.model.js';
 import cloudinary from '../lib/cloudinary.js';
+import fs from 'fs';
 
 // helper function for cloudinary upload
 const uploadToCloudinary = async (file) => {
@@ -13,6 +14,13 @@ const uploadToCloudinary = async (file) => {
   } catch (error) {
     console.log('Error uploading to cloudinary:', error);
     throw new Error('Error uploading to cloudinary');
+  } finally {
+    // 성공/실패 여부와 관계없이 로컬 임시 파일 제거
+    if (file && file.tempFilePath) {
+      fs.unlink(file.tempFilePath, (err) => {
+        if (err) console.error("Error deleting temp file:", err);
+      });
+    }
   }
 };
 

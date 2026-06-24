@@ -10,11 +10,13 @@ import {
 import { useAuth } from '@clerk/react';
 import { useMusicStore } from '@/store/useMusicStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useChatStore } from '@/store/useChatStore';
 
 const LeftSidebar = () => {
   const { albums, fetchAlbums, isLoading } = useMusicStore();
   const { isSignedIn } = useAuth();
   const { isAdmin } = useAuthStore();
+  const { setSelectedUser } = useChatStore();
   const location = useLocation();
 
   useEffect(() => {
@@ -39,6 +41,7 @@ const LeftSidebar = () => {
         {isSignedIn && (
           <Link
             to="/chat"
+            onClick={() => setSelectedUser(null)}
             className={`flex items-center gap-4 text-sm font-semibold transition-colors duration-200 justify-center md:justify-start ${
               location.pathname === '/chat'
                 ? 'text-white'

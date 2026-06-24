@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "@/lib/axios";
-import axios from "axios";
+import { axiosInstance, getErrorMessage } from "@/lib/axios";
 
 export interface Song {
   _id: string;
@@ -55,16 +54,6 @@ interface MusicStore {
   createSong: (formData: FormData) => Promise<void>;
   createAlbum: (formData: FormData) => Promise<void>;
 }
-
-const getErrorMessage = (error: unknown, fallback: string): string => {
-  if (axios.isAxiosError(error)) {
-    return error.response?.data?.message || error.message;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return fallback;
-};
 
 export const useMusicStore = create<MusicStore>((set) => ({
   songs: [],

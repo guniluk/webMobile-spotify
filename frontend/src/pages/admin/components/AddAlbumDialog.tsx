@@ -57,8 +57,9 @@ const AddAlbumDialog = ({ isOpen, onClose }: AddAlbumDialogProps) => {
       setReleaseYear(new Date().getFullYear());
       setImageFile(null);
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "앨범 추가에 실패했습니다.");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || "앨범 추가에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
