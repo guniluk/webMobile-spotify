@@ -10,20 +10,29 @@ export const protectRoute = async (req, res, next) => {
 
     // 데이터베이스에서 해당 Clerk ID의 사용자 조회
     let user = await User.findOne({ clerkId: userId });
-    
+
     // 만약 데이터베이스에 유저가 없다면 Clerk API를 통해 프로필을 실시간으로 가져와 동기화 (Auto-sync Fallback)
     if (!user) {
       try {
         const clerkUser = await clerkClient.users.getUser(userId);
         user = await User.create({
           clerkId: userId,
-          fullName: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Anonymous",
+          fullName:
+            `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() ||
+            'Anonymous',
           imageUrl: clerkUser.imageUrl,
         });
-        console.log(`User auto-synced to DB via protectRoute middleware: ${userId}`);
+        console.log(
+          `User auto-synced to DB via protectRoute middleware: ${userId}`,
+        );
       } catch (clerkError) {
-        console.error("Clerk user fetch failed during middleware auto-sync:", clerkError);
-        return res.status(404).json({ message: 'User not found and sync failed' });
+        console.error(
+          'Clerk user fetch failed during middleware auto-sync:',
+          clerkError,
+        );
+        return res
+          .status(404)
+          .json({ message: 'User not found and sync failed' });
       }
     }
 
@@ -31,7 +40,7 @@ export const protectRoute = async (req, res, next) => {
     req.currentUser = user;
     next();
   } catch (error) {
-    console.log("Error in protectRoute middleware: ", error);
+    console.log('Error in protectRoute middleware: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -1,4 +1,12 @@
 import "../global.css";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+
+// Disable strict mode to suppress warnings about reading shared values during render
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
+
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/clerk-expo";

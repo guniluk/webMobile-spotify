@@ -18,7 +18,7 @@ const uploadToCloudinary = async (file) => {
     // 성공/실패 여부와 관계없이 로컬 임시 파일 제거
     if (file && file.tempFilePath) {
       fs.unlink(file.tempFilePath, (err) => {
-        if (err) console.error("Error deleting temp file:", err);
+        if (err) console.error('Error deleting temp file:', err);
       });
     }
   }

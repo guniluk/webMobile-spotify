@@ -8,12 +8,35 @@ import { useRouter } from "expo-router";
 
 WebBrowser.maybeCompleteAuthSession();
 
+// WebBrowser warm up hook for better performance and session control
+function useWarmUpBrowser() {
+  React.useEffect(() => {
+    void WebBrowser.warmUpAsync();
+    return () => {
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
+}
+
 export default function LoginScreen() {
+  useWarmUpBrowser();
   const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
   const handleGoogleLogin = React.useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+
     try {
+      // Dismiss any existing browser session to avoid "Another web browser is already open" error
+      // Catch and ignore errors if there is no browser to dismiss (e.g. initial login)
+      try {
+        await WebBrowser.dismissBrowser();
+      } catch (e) {
+        // Ignore error when there is no web browser to dismiss
+      }
+
       const { createdSessionId, setActive } = await startOAuthFlow({
         redirectUrl: Linking.createURL("/sso-callback", { scheme: "mobile" }),
       });
@@ -24,8 +47,10 @@ export default function LoginScreen() {
       }
     } catch (err) {
       console.error("OAuth error on mobile:", err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [startOAuthFlow, router]);
+  }, [startOAuthFlow, router, isLoading]);
 
   return (
     <View className="flex-1 bg-[#121212] items-center justify-center p-6">
@@ -48,18 +73,24 @@ export default function LoginScreen() {
       {/* Google Login Button */}
       <TouchableOpacity
         onPress={handleGoogleLogin}
-        className="w-full flex-row items-center justify-center bg-emerald-500 hover:bg-emerald-400 py-3.5 px-6 rounded-full shadow-lg active:scale-95 transition-all"
+        disabled={isLoading}
+        className={`w-full flex-row items-center justify-center bg-emerald-500 hover:bg-emerald-400 py-3.5 px-6 rounded-full shadow-lg active:scale-95 transition-all ${
+          isLoading ? "opacity-60" : ""
+        }`}
       >
         <Image
           source={{ uri: "https://cdn-icons-png.flaticon.com/512/2991/2991148.png" }}
           style={{ width: 18, height: 18, marginRight: 10, tintColor: "black" }}
         />
-        <Text className="text-black font-bold text-base">Google 계정으로 계속하기</Text>
+        <Text className="text-black font-bold text-base">
+          {isLoading ? "로그인 중..." : "Google 계정으로 계속하기"}
+        </Text>
       </TouchableOpacity>
 
       {/* Guest bypass */}
       <TouchableOpacity
         onPress={() => router.replace("/(tabs)")}
+        disabled={isLoading}
         className="mt-6 py-2"
       >
         <Text className="text-zinc-500 hover:text-zinc-300 text-xs font-semibold underline">
@@ -69,3 +100,4 @@ export default function LoginScreen() {
     </View>
   );
 }
+
