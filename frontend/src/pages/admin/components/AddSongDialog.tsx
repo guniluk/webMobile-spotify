@@ -1,6 +1,12 @@
 import React, { useRef, useState } from "react";
 import { useMusicStore } from "@/store/useMusicStore";
-import { X, Upload, Music, Image as ImageIcon, CheckCircle } from "lucide-react";
+import {
+  X,
+  Upload,
+  Music,
+  Image as ImageIcon,
+  CheckCircle,
+} from "lucide-react";
 
 interface AddSongDialogProps {
   isOpen: boolean;
@@ -52,17 +58,17 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
     setError(null);
 
     if (!title.trim() || !artist.trim() || !durationStr.trim()) {
-      setError("모든 텍스트 필드를 입력해 주세요.");
+      setError("Fill All Text Fields");
       return;
     }
 
     if (!imageFile) {
-      setError("커버 이미지를 업로드해 주세요.");
+      setError("Upload Cover Image.");
       return;
     }
 
     if (!audioFile) {
-      setError("오디오 파일을 업로드해 주세요.");
+      setError("Upload Audio File.");
       return;
     }
 
@@ -71,7 +77,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
     try {
       const duration = parseDuration(durationStr);
       if (duration <= 0) {
-        throw new Error("올바른 재생 시간을 입력해 주세요 (예: 3:20 또는 초 단위 숫자).");
+        throw new Error("Input Proper Duration (e.g., 3:20 or seconds).");
       }
 
       const formData = new FormData();
@@ -96,8 +102,13 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
       setAudioFile(null);
       onClose();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      setError(error.response?.data?.message || error.message || "노래 추가에 실패했습니다.");
+      const error = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setError(
+        error.response?.data?.message || error.message || "failed to add song.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -106,27 +117,27 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl w-full max-w-md shadow-2xl relative animate-in fade-in-50 zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute transition-colors top-4 right-4 text-zinc-400 hover:text-white"
           title="Close Modal"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+        <h2 className="flex items-center gap-2 mb-1 text-xl font-bold text-white">
           <Music className="w-5 h-5 text-green-500" />
           <span>Add New Song</span>
         </h2>
-        <p className="text-xs text-zinc-400 mb-6">
-          음악 카탈로그에 새로운 노래를 추가합니다.
+        <p className="mb-6 text-xs text-zinc-400">
+          Add a new song to the music catalog.
         </p>
 
         {error && (
-          <div className="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium">
+          <div className="p-3 mb-4 text-xs font-medium text-red-500 border rounded-lg bg-red-500/10 border-red-500/20">
             {error}
           </div>
         )}
@@ -142,7 +153,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter song title"
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/60 rounded-lg text-white text-sm placeholder-zinc-500 focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-3 py-2 text-sm text-white transition-colors border rounded-lg bg-zinc-800 border-zinc-700/60 placeholder-zinc-500 focus:outline-none focus:border-green-500"
               required
             />
           </div>
@@ -157,7 +168,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
               placeholder="Enter artist name"
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/60 rounded-lg text-white text-sm placeholder-zinc-500 focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-3 py-2 text-sm text-white transition-colors border rounded-lg bg-zinc-800 border-zinc-700/60 placeholder-zinc-500 focus:outline-none focus:border-green-500"
               required
             />
           </div>
@@ -173,7 +184,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
                 value={durationStr}
                 onChange={(e) => setDurationStr(e.target.value)}
                 placeholder="e.g. 3:45 or 225"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/60 rounded-lg text-white text-sm placeholder-zinc-500 focus:outline-none focus:border-green-500 transition-colors"
+                className="w-full px-3 py-2 text-sm text-white transition-colors border rounded-lg bg-zinc-800 border-zinc-700/60 placeholder-zinc-500 focus:outline-none focus:border-green-500"
                 required
               />
             </div>
@@ -184,7 +195,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
               <select
                 value={albumId}
                 onChange={(e) => setAlbumId(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/60 rounded-lg text-white text-sm placeholder-zinc-500 focus:outline-none focus:border-green-500 transition-colors cursor-pointer"
+                className="w-full px-3 py-2 text-sm text-white transition-colors border rounded-lg cursor-pointer bg-zinc-800 border-zinc-700/60 placeholder-zinc-500 focus:outline-none focus:border-green-500"
               >
                 <option value="">None (Single)</option>
                 {albums.map((album) => (
@@ -210,12 +221,12 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
             />
             <div
               onClick={() => imageInputRef.current?.click()}
-              className="border-2 border-dashed border-zinc-700 hover:border-green-500 bg-zinc-800/40 hover:bg-zinc-800/80 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+              className="flex flex-col items-center justify-center p-4 transition-all duration-300 border-2 border-dashed cursor-pointer border-zinc-700 hover:border-green-500 bg-zinc-800/40 hover:bg-zinc-800/80 rounded-xl group"
             >
               {imageFile ? (
                 <div className="flex flex-col items-center text-center">
-                  <CheckCircle className="w-8 h-8 text-green-500 mb-2 animate-bounce" />
-                  <p className="text-xs text-white font-medium truncate max-w-[250px]">
+                  <CheckCircle className="w-8 h-8 mb-2 text-green-500 animate-bounce" />
+                  <p className="text-xs text-white font-medium truncate max-w-62.5">
                     {imageFile.name}
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-1">
@@ -224,8 +235,8 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
                 </div>
               ) : (
                 <>
-                  <ImageIcon className="w-8 h-8 text-zinc-500 group-hover:text-green-500 mb-2 transition-colors duration-300" />
-                  <p className="text-xs text-zinc-300 font-medium">
+                  <ImageIcon className="w-8 h-8 mb-2 transition-colors duration-300 text-zinc-500 group-hover:text-green-500" />
+                  <p className="text-xs font-medium text-zinc-300">
                     Upload Cover Image
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-1">
@@ -250,12 +261,12 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
             />
             <div
               onClick={() => audioInputRef.current?.click()}
-              className="border-2 border-dashed border-zinc-700 hover:border-green-500 bg-zinc-800/40 hover:bg-zinc-800/80 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+              className="flex flex-col items-center justify-center p-4 transition-all duration-300 border-2 border-dashed cursor-pointer border-zinc-700 hover:border-green-500 bg-zinc-800/40 hover:bg-zinc-800/80 rounded-xl group"
             >
               {audioFile ? (
                 <div className="flex flex-col items-center text-center">
-                  <CheckCircle className="w-8 h-8 text-green-500 mb-2 animate-bounce" />
-                  <p className="text-xs text-white font-medium truncate max-w-[250px]">
+                  <CheckCircle className="w-8 h-8 mb-2 text-green-500 animate-bounce" />
+                  <p className="text-xs text-white font-medium truncate max-w-62.5">
                     {audioFile.name}
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-1">
@@ -264,8 +275,8 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
                 </div>
               ) : (
                 <>
-                  <Upload className="w-8 h-8 text-zinc-500 group-hover:text-green-500 mb-2 transition-colors duration-300" />
-                  <p className="text-xs text-zinc-300 font-medium">
+                  <Upload className="w-8 h-8 mb-2 transition-colors duration-300 text-zinc-500 group-hover:text-green-500" />
+                  <p className="text-xs font-medium text-zinc-300">
                     Upload Audio File
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-1">
@@ -277,12 +288,12 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 justify-end pt-2">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/60 hover:border-zinc-600 rounded-lg text-zinc-300 text-sm font-semibold transition-all disabled:opacity-50"
+              className="px-4 py-2 text-sm font-semibold transition-all border rounded-lg bg-zinc-800 hover:bg-zinc-700 border-zinc-700/60 hover:border-zinc-600 text-zinc-300 disabled:opacity-50"
             >
               Cancel
             </button>
@@ -293,7 +304,7 @@ const AddSongDialog = ({ isOpen, onClose }: AddSongDialogProps) => {
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-black rounded-full border-t-transparent animate-spin"></div>
                   <span>Adding...</span>
                 </>
               ) : (

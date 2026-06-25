@@ -84,8 +84,10 @@ export default function HomeScreen() {
             {isSignedIn ? (
               <View className="flex-row items-center gap-2">
                 <Image
-                  source={user?.imageUrl || ""}
-                  className="w-8 h-8 rounded-full border border-zinc-800"
+                  source={user?.imageUrl ? { uri: user.imageUrl } : undefined}
+                  style={{ width: 32, height: 32, borderRadius: 16 }}
+                  className="border border-zinc-800 bg-zinc-800"
+                  contentFit="cover"
                 />
                 <TouchableOpacity
                   onPress={handleAuthPress}
@@ -131,8 +133,8 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </View>
-                <View className="w-7 h-7 bg-emerald-500 rounded-full items-center justify-center">
-                  <Play size={12} fill="black" color="black" className="ml-0.5" />
+                <View className="w-7 h-7 bg-emerald-500/30 rounded-full items-center justify-center">
+                  <Play size={12} fill="black" color="black" className="ml-0.5 opacity-75" />
                 </View>
               </TouchableOpacity>
             ))}
@@ -189,8 +191,8 @@ export default function HomeScreen() {
                     className="rounded-xl bg-zinc-800"
                     style={{ width: "100%", height: 110 }}
                   />
-                  <View className="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-full items-center justify-center shadow-lg">
-                    <Play size={14} fill="black" color="black" className="ml-0.5" />
+                  <View className="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500/30 rounded-full items-center justify-center shadow-lg">
+                    <Play size={14} fill="black" color="black" className="ml-0.5 opacity-75" />
                   </View>
                 </View>
                 <Text numberOfLines={1} className="text-white text-xs font-bold mt-2">
@@ -224,8 +226,8 @@ export default function HomeScreen() {
                     className="rounded-xl bg-zinc-800"
                     style={{ width: "100%", height: 110 }}
                   />
-                  <View className="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-full items-center justify-center shadow-lg">
-                    <Play size={14} fill="black" color="black" className="ml-0.5" />
+                  <View className="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500/30 rounded-full items-center justify-center shadow-lg">
+                    <Play size={14} fill="black" color="black" className="ml-0.5 opacity-75" />
                   </View>
                 </View>
                 <Text numberOfLines={1} className="text-white text-xs font-bold mt-2">

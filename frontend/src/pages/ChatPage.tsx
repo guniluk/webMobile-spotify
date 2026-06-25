@@ -32,10 +32,12 @@ const ChatPage = () => {
 
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // 안 읽은 새 메시지 영역의 강조 및 구분선 노출 여부를 관리하는 상태
   const [showUnreadDivider, setShowUnreadDivider] = useState(true);
-  const [prevUserId, setPrevUserId] = useState<string | undefined>(selectedUser?._id);
+  const [prevUserId, setPrevUserId] = useState<string | undefined>(
+    selectedUser?._id,
+  );
 
   // 이전 선택한 유저와 현재 유저가 다르면 상태를 리셋 (동기 리렌더 방지 패턴)
   if (selectedUser?._id !== prevUserId) {
@@ -59,7 +61,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (selectedUser && isSignedIn) {
       fetchMessages(selectedUser._id);
-      
+
       const timer = setTimeout(() => {
         setShowUnreadDivider(false);
       }, 10000); // 10초
@@ -86,9 +88,9 @@ const ChatPage = () => {
   const handleEraseMessages = async () => {
     if (!selectedUser) return;
     const confirmDelete = window.confirm(
-      `${selectedUser.fullName}님과의 모든 채팅 메시지를 삭제하시겠습니까?\n삭제된 메시지는 복구할 수 없습니다.`
+      `${selectedUser.fullName}님과의 모든 채팅 메시지를 삭제하시겠습니까?\n삭제된 메시지는 복구할 수 없습니다.`,
     );
-    
+
     if (confirmDelete) {
       await clearMessages(selectedUser._id);
     }
@@ -98,7 +100,7 @@ const ChatPage = () => {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 rounded-full border-emerald-500 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -122,18 +124,24 @@ const ChatPage = () => {
                 <img
                   src={selectedUser.imageUrl}
                   alt={selectedUser.fullName}
-                  className="w-full h-full object-cover rounded-full border border-zinc-700/50"
+                  className="object-cover w-full h-full border rounded-full border-zinc-700/50"
                 />
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border border-[#121212] ${
-                    onlineUsers.includes(selectedUser.clerkId) ? "bg-emerald-500" : "bg-zinc-500"
+                    onlineUsers.includes(selectedUser.clerkId)
+                      ? "bg-emerald-500"
+                      : "bg-zinc-500"
                   }`}
                 />
               </div>
               <div>
-                <h3 className="font-semibold text-zinc-100 text-sm">{selectedUser.fullName}</h3>
+                <h3 className="text-sm font-semibold text-zinc-100">
+                  {selectedUser.fullName}
+                </h3>
                 <p className="text-xs text-zinc-400">
-                  {onlineUsers.includes(selectedUser.clerkId) ? "Online" : "Offline"}
+                  {onlineUsers.includes(selectedUser.clerkId)
+                    ? "Online"
+                    : "Offline"}
                 </p>
               </div>
             </div>
@@ -141,10 +149,11 @@ const ChatPage = () => {
             <div className="flex items-center gap-3 shrink-0">
               {/* 상대방이 노래 재생 중일 때 헤더에 표시 */}
               {onlineUsers.includes(selectedUser.clerkId) &&
-                userActivities[selectedUser.clerkId]?.status === "Listening" && (
-                  <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 max-w-[150px] sm:max-w-xs md:max-w-md shrink-0 animate-pulse">
+                userActivities[selectedUser.clerkId]?.status ===
+                  "Listening" && (
+                  <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 max-w-37.5 sm:max-w-xs md:max-w-md shrink-0 animate-pulse">
                     <Headphones className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-xs text-emerald-300 truncate font-medium">
+                    <span className="text-xs font-medium truncate text-emerald-300">
                       {userActivities[selectedUser.clerkId].activity}
                     </span>
                   </div>
@@ -163,29 +172,32 @@ const ChatPage = () => {
           </div>
 
           {/* 2. 메시지 내용 영역 */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+          <div className="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
             {isLoading && messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
-                <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-4 rounded-full border-emerald-500 border-t-transparent animate-spin" />
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-zinc-500 space-y-2">
+              <div className="flex flex-col items-center justify-center h-full space-y-2 text-zinc-500">
                 <MessageSquare className="w-12 h-12 text-zinc-700 animate-bounce" />
-                <p className="text-sm">Start your conversation with {selectedUser.fullName}</p>
+                <p className="text-sm">
+                  Start your conversation with {selectedUser.fullName}
+                </p>
               </div>
             ) : (
               messages.map((message) => {
                 const isMyMessage = message.senderId !== selectedUser._id;
                 // 내가 받음 + 안 읽은 메시지 확인
                 const isUnread = !isMyMessage && !message.isRead;
-                
+
                 // 구분선 노출 중일 때만 안 읽은 영역으로 강조 및 구분선 렌더링
                 const shouldHighlight = isUnread && showUnreadDivider;
 
                 return (
                   <div key={message._id}>
                     {/* 신규 안 읽은 메시지 구분선 (10초가 지나 다 확인하면 부드럽게 사라짐) */}
-                    {shouldHighlight && !unreadDividerRendered && (
+                    {shouldHighlight &&
+                      !unreadDividerRendered &&
                       (() => {
                         unreadDividerRendered = true;
                         return (
@@ -197,20 +209,21 @@ const ChatPage = () => {
                             <div className="flex-1 border-t border-emerald-500/30 animate-pulse" />
                           </div>
                         );
-                      })()
-                    )}
+                      })()}
 
-                    <div className={`flex ${isMyMessage ? "justify-end" : "justify-start"} mt-2`}>
+                    <div
+                      className={`flex ${isMyMessage ? "justify-end" : "justify-start"} mt-2`}
+                    >
                       <div
                         className={`max-w-md p-4 rounded-2xl relative shadow-md group border transition-all duration-500 ${
                           isMyMessage
                             ? "bg-emerald-600 text-white rounded-tr-none border-transparent"
                             : shouldHighlight
-                            ? "bg-zinc-900 text-zinc-200 rounded-tl-none border-emerald-500/40 ring-4 ring-emerald-500/5 shadow-lg shadow-emerald-500/5"
-                            : "bg-zinc-800 text-zinc-200 rounded-tl-none border-transparent"
+                              ? "bg-zinc-900 text-zinc-200 rounded-tl-none border-emerald-500/40 ring-4 ring-emerald-500/5 shadow-lg shadow-emerald-500/5"
+                              : "bg-zinc-800 text-zinc-200 rounded-tl-none border-transparent"
                         }`}
                       >
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words pr-2">
+                        <p className="pr-2 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
                           {message.content}
                         </p>
                         <div className="flex items-center gap-2 mt-1.5 opacity-60">
@@ -237,12 +250,12 @@ const ChatPage = () => {
               placeholder={`Send a message to ${selectedUser.fullName}...`}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              className="flex-1 bg-zinc-800 text-white text-sm rounded-full py-3 px-5 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 placeholder-zinc-500"
+              className="flex-1 px-5 py-3 text-sm text-white rounded-full bg-zinc-800 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 placeholder-zinc-500"
             />
             <button
               type="submit"
               disabled={!inputMessage.trim()}
-              className="p-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 text-black disabled:text-zinc-600 rounded-full transition-all duration-200 cursor-pointer shadow-md disabled:cursor-not-allowed shrink-0"
+              className="p-3 text-black transition-all duration-200 rounded-full shadow-md cursor-pointer bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -252,14 +265,17 @@ const ChatPage = () => {
         // 4. 플레이스홀더 영역 (화면 중앙 정렬)
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-zinc-500 bg-[#181818]/20">
           <div className="relative mb-6">
-            <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-2xl animate-pulse" />
-            <div className="relative w-24 h-24 bg-zinc-800/40 border border-zinc-800/50 rounded-full flex items-center justify-center shadow-inner">
+            <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-2xl animate-pulse" />
+            <div className="relative flex items-center justify-center w-24 h-24 border rounded-full shadow-inner bg-zinc-800/40 border-zinc-800/50">
               <MessageSquare className="w-12 h-12 text-zinc-400 animate-bounce" />
             </div>
           </div>
-          <h3 className="text-zinc-200 font-extrabold text-xl mb-2 tracking-tight">No conversation selected</h3>
-          <p className="text-sm text-zinc-400 max-w-sm leading-relaxed mb-6">
-            오른쪽 사이드바의 친구 목록에서 대화할 대상을 선택하여 실시간 채팅을 시작해보세요!
+          <h3 className="mb-2 text-xl font-extrabold tracking-tight text-zinc-200">
+            No conversation selected
+          </h3>
+          <p className="max-w-sm mb-6 text-sm leading-relaxed text-zinc-400">
+            오른쪽 사이드바의 친구 목록에서 대화할 대상을 선택하여 실시간 채팅을
+            시작해보세요!
           </p>
         </div>
       )}

@@ -1,12 +1,9 @@
 import "../global.css";
-import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
-
-// Disable strict mode to suppress warnings about reading shared values during render
-configureReanimatedLogger({
-  level: ReanimatedLogLevel.warn,
-  strict: false,
-});
-
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
+import * as WebBrowser from "expo-web-browser";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/clerk-expo";
@@ -15,17 +12,48 @@ import { setupAxiosInterceptors } from "@/lib/axios";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSocketSync } from "@/hooks/useSocketSync";
 import { View, ActivityIndicator } from "react-native";
+import * as Linking from "expo-linking";
+
+// WebBrowser warm up for Auth session
+WebBrowser.maybeCompleteAuthSession();
+
+// Disable strict mode to suppress warnings about reading shared values during render
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 if (!publishableKey) {
-  throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable.");
+  throw new Error(
+    "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable.",
+  );
 }
 
 function InitialLayout() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
   const { checkAdminStatus, reset } = useAuthStore();
   const [initFinished, setInitFinished] = useState(false);
+
+  // 딥링크 이벤트 수신 로깅 (OAuth 콜백 디버깅용)
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      console.log("📥 [Debug] Received deep link on mobile:", event.url);
+    };
+
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        console.log("🚀 [Debug] App launched with deep link:", url);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // 전역 실시간 소켓 및 활동(음악 정보) 동기화 훅 호출
   useSocketSync();
@@ -37,11 +65,10 @@ function InitialLayout() {
         setupAxiosInterceptors(getToken);
 
         if (isSignedIn) {
-          try {
-            await checkAdminStatus();
-          } catch (error) {
+          // 어드민 여부 확인은 백그라운드에서 비동기로 수행하여 앱 초기화를 블로킹하지 않도록 함
+          checkAdminStatus().catch((error) => {
             console.error("Admin status check failed on mobile:", error);
-          }
+          });
         } else {
           reset();
         }
@@ -62,10 +89,21 @@ function InitialLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#121212" } }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "#121212" },
+      }}
+    >
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="album/[albumId]" options={{ animation: "slide_from_right" }} />
-      <Stack.Screen name="chat/[userId]" options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="album/[albumId]"
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="chat/[userId]"
+        options={{ animation: "slide_from_right" }}
+      />
       <Stack.Screen name="auth/login" options={{ presentation: "modal" }} />
     </Stack>
   );

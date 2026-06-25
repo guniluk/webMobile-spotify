@@ -38,21 +38,23 @@ const AdminPage = () => {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6">
-        <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-md w-full text-center shadow-2xl">
-          <div className="inline-flex p-4 rounded-full bg-red-500/10 text-red-500 mb-4 animate-bounce">
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-zinc-950">
+        <div className="w-full max-w-md p-8 text-center border shadow-2xl bg-zinc-900 border-zinc-800 rounded-2xl">
+          <div className="inline-flex p-4 mb-4 text-red-500 rounded-full bg-red-500/10 animate-bounce">
             <ShieldAlert size={48} />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">접근 제한됨</h2>
-          <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-            죄송합니다. 이 페이지는 관리자만 접근할 수 있습니다. <br />
-            관리자 계정으로 로그인해 주세요.
+          <h2 className="mb-2 text-xl font-bold text-white">
+            You are not Admin
+          </h2>
+          <p className="mb-6 text-sm leading-relaxed text-zinc-400">
+            You are not authorized to access this page. Please login with an
+            admin account.
           </p>
           <a
             href="/"
             className="inline-flex w-full justify-center px-4 py-2.5 bg-green-500 hover:bg-green-400 text-black font-semibold rounded-lg shadow-lg hover:shadow-green-500/10 transition-all duration-300"
           >
-            홈으로 돌아가기
+            Go to Home
           </a>
         </div>
       </div>
@@ -60,23 +62,23 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-zinc-900 to-black text-white">
+    <div className="min-h-screen text-white bg-linear-to-b from-zinc-900 to-black">
       {/* Top Header */}
       <Topbar />
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <main className="px-4 py-8 mx-auto max-w-7xl md:px-8">
         {/* Title Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-center">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-500/10 text-green-500 rounded-2xl border border-green-500/20 shadow-inner">
+            <div className="p-3 text-green-500 border shadow-inner bg-green-500/10 rounded-2xl border-green-500/20">
               <Settings className="w-8 h-8 animate-spin-slow" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-green-500 font-extrabold text-2xl tracking-tighter">
+                <span className="text-2xl font-extrabold tracking-tighter text-green-500">
                   Spotify
                 </span>
-                <span className="text-white font-extrabold text-2xl tracking-tight">
+                <span className="text-2xl font-extrabold tracking-tight text-white">
                   Music Manager
                 </span>
               </div>
@@ -125,35 +127,35 @@ const AdminPage = () => {
         </div>
 
         {/* Content Section (Library Lists) */}
-        <div className="bg-zinc-900/20 border border-zinc-800/60 rounded-2xl p-6 backdrop-blur-xl">
+        <div className="p-6 border bg-zinc-900/20 border-zinc-800/60 rounded-2xl backdrop-blur-xl">
           {/* Library Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col justify-between gap-4 mb-6 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2.5">
               {activeTab === "songs" ? (
                 <>
-                  <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                     <Music className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">
                       Songs Library
                     </h2>
-                    <p className="text-xs text-zinc-500 font-medium">
-                      총 {songs.length}곡
+                    <p className="text-xs font-medium text-zinc-500">
+                      Total {songs.length} Songs
                     </p>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="p-2 bg-violet-500/10 text-violet-500 rounded-lg">
+                  <div className="p-2 rounded-lg bg-violet-500/10 text-violet-500">
                     <Library className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">
                       Albums Library
                     </h2>
-                    <p className="text-xs text-zinc-500 font-medium">
-                      총 {albums.length}개 앨범
+                    <p className="text-xs font-medium text-zinc-500">
+                      Total {albums.length} Albums
                     </p>
                   </div>
                 </>
@@ -181,7 +183,7 @@ const AdminPage = () => {
           </div>
 
           {/* List Area with Scroll */}
-          <div className="max-h-125 overflow-y-auto pr-1 custom-scrollbar">
+          <div className="pr-1 overflow-y-auto max-h-125 custom-scrollbar">
             {activeTab === "songs" ? <SongsTable /> : <AlbumsTable />}
           </div>
         </div>

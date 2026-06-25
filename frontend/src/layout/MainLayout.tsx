@@ -15,7 +15,7 @@ const MainLayout = () => {
   const { currentSong } = usePlayerStore();
 
   const [showRightSidebar, setShowRightSidebar] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true,
   );
 
   useEffect(() => {
@@ -27,10 +27,10 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-black text-white p-2">
+    <div className="flex flex-col h-screen p-2 text-white bg-black">
       <ResizablePanelGroup
         orientation="horizontal"
-        className="flex-1 flex h-full overflow-hidden gap-2"
+        className="flex flex-1 h-full gap-2 overflow-hidden"
       >
         {/* left sidebar */}
         <ResizablePanel
@@ -41,7 +41,7 @@ const MainLayout = () => {
           <LeftSidebar />
         </ResizablePanel>
 
-        <ResizableHandle className="w-1 bg-transparent hover:bg-neutral-800 transition-colors" />
+        <ResizableHandle className="w-1 transition-colors bg-transparent hover:bg-neutral-800" />
 
         {/* main Content */}
         <ResizablePanel defaultSize={isMobile ? "80" : "52"}>
@@ -52,7 +52,7 @@ const MainLayout = () => {
 
         {showRightSidebar && (
           <>
-            <ResizableHandle className="w-1 bg-transparent hover:bg-neutral-800 transition-colors" />
+            <ResizableHandle className="w-1 transition-colors bg-transparent hover:bg-neutral-800" />
 
             {/* right sidebar */}
             <ResizablePanel

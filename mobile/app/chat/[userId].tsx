@@ -138,8 +138,10 @@ export default function ChatRoomScreen() {
           </TouchableOpacity>
           
           <Image
-            source={selectedUser.imageUrl}
-            className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-800"
+            source={selectedUser.imageUrl ? { uri: selectedUser.imageUrl } : undefined}
+            style={{ width: 36, height: 36, borderRadius: 18 }}
+            className="bg-zinc-800 border border-zinc-800"
+            contentFit="cover"
           />
           
           <View className="ml-3 flex-1">

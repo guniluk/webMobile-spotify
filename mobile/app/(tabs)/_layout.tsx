@@ -3,8 +3,12 @@ import { Tabs } from "expo-router";
 import { Home, MessageSquare } from "lucide-react-native";
 import { View, StyleSheet } from "react-native";
 import MiniPlayer from "@/components/MiniPlayer";
+import { useChatStore } from "@/store/useChatStore";
 
 export default function TabLayout() {
+  const { unreadUsers } = useChatStore();
+  const unreadCount = unreadUsers.length;
+
   return (
     <View style={styles.container}>
       {/* 탭 네비게이션 */}
@@ -39,6 +43,13 @@ export default function TabLayout() {
           options={{
             title: "채팅",
             tabBarIcon: ({ color, size }) => <MessageSquare color={color} size={size} />,
+            tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+            tabBarBadgeStyle: {
+              backgroundColor: "#10B981",
+              color: "#000000",
+              fontSize: 10,
+              fontWeight: "bold",
+            },
           }}
         />
       </Tabs>

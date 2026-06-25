@@ -1,12 +1,11 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { useOAuth } from "@clerk/clerk-expo";
+import { useSSO } from "@clerk/clerk-expo";
 import * as WebBrowser from "expo-web-browser";
-import * as Linking from "expo-linking";
+import * as AuthSession from "expo-auth-session";
 import { Music4 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 
-WebBrowser.maybeCompleteAuthSession();
 
 // WebBrowser warm up hook for better performance and session control
 function useWarmUpBrowser() {
@@ -22,35 +21,38 @@ export default function LoginScreen() {
   useWarmUpBrowser();
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
-  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+  const { startSSOFlow } = useSSO();
 
   const handleGoogleLogin = React.useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
 
     try {
-      // Dismiss any existing browser session to avoid "Another web browser is already open" error
-      // Catch and ignore errors if there is no browser to dismiss (e.g. initial login)
-      try {
-        await WebBrowser.dismissBrowser();
-      } catch (e) {
-        // Ignore error when there is no web browser to dismiss
-      }
 
-      const { createdSessionId, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL("/sso-callback", { scheme: "mobile" }),
+
+      // AuthSession.makeRedirectUri를 사용하여 Expo Go와 빌드 환경 모두에 호환되는 올바른 리디렉트 URL을 얻습니다.
+      const redirectUrl = AuthSession.makeRedirectUri({
+        path: "sso-callback",
+      });
+
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl,
       });
 
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
         router.replace("/(tabs)");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("OAuth error on mobile:", err);
+      // 실물 기기에서 에러 원인을 추적할 수 있도록 Alert 팝업을 추가합니다.
+      const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
+      alert(`로그인 오류가 발생했습니다:\n${errorMsg}`);
     } finally {
       setIsLoading(false);
     }
-  }, [startOAuthFlow, router, isLoading]);
+  }, [startSSOFlow, router, isLoading]);
 
   return (
     <View className="flex-1 bg-[#121212] items-center justify-center p-6">

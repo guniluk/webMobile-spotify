@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/api', //server address
+  baseURL: "http://localhost:3000/api", //server address
 });
 
 export const getErrorMessage = (error: unknown, fallback: string): string => {

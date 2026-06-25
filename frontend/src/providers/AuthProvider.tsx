@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '@clerk/react';
-import { axiosInstance } from '@/lib/axios';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Loader } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/react";
+import { axiosInstance } from "@/lib/axios";
+import { useAuthStore } from "@/store/useAuthStore";
+import { Loader } from "lucide-react";
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { getToken, isLoaded, isSignedIn } = useAuth();
@@ -18,13 +18,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             config.headers.Authorization = `Bearer ${token}`;
           }
         } catch (error) {
-          console.error('Error setting auth token:', error);
+          console.error("Error setting auth token:", error);
         }
         return config;
       },
       (error) => {
         return Promise.reject(error);
-      }
+      },
     );
 
     return () => {
@@ -39,7 +39,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           try {
             await checkAdminStatus();
           } catch (error) {
-            console.error('Error checking admin status:', error);
+            console.error("Error checking admin status:", error);
           }
         } else {
           reset();
@@ -52,7 +52,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (loading)
     return (
-      <div className="h-screen w-full flex items-center justify-center">
+      <div className="flex items-center justify-center w-full h-screen">
         <Loader className="size-8 text-emerald-500 animate-spin" />
       </div>
     );
