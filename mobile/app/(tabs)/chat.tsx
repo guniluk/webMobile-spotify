@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { useUser } from "@clerk/clerk-expo";
@@ -33,6 +34,20 @@ export default function ChatListScreen() {
     unreadUsers,
     setSelectedUser,
   } = useChatStore();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    if (!isSignedIn) return;
+    setRefreshing(true);
+    try {
+      await fetchUsers();
+    } catch (error) {
+      console.error("Chat refresh failed:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [isSignedIn, fetchUsers]);
 
   // 화면이 활성화(Focus)될 때마다 최신 유저 정보 및 대화 기록 목록 조회
   useFocusEffect(
@@ -63,7 +78,7 @@ export default function ChatListScreen() {
       <View className="flex-row items-center gap-2 px-4 py-3.5 border-b border-zinc-900/50 bg-[#121212]">
         <Users size={20} className="text-zinc-400" />
         <Text className="text-base font-black tracking-tight text-white">
-          친구 활동 및 채팅
+          User activity and chat
         </Text>
       </View>
 
@@ -71,27 +86,35 @@ export default function ChatListScreen() {
         // 비인증 플레이스홀더 뷰
         <View className="items-center justify-center flex-1 p-6 text-center">
           <View className="items-center justify-center w-16 h-16 mb-5 border rounded-full bg-zinc-800/50 border-zinc-800">
-            <Users size={28} className="text-zinc-400" />
+            <Users size={28} color="#FBBF24" />
           </View>
           <Text className="text-white font-bold text-base mb-1.5">
-            친구들의 음악 듣기
+            Find friends and listen to music together
           </Text>
           <Text className="text-zinc-400 text-xs text-center max-w-[240px] leading-relaxed mb-6">
-            로그인하면 친구들의 실시간 감상 활동을 확인하고, 1:1 메시지를
-            주고받을 수 있습니다.
+            Log in to check your friends&apos; real-time music listening
+            activity and exchange 1:1 messages.
           </Text>
           <TouchableOpacity
             onPress={() => router.push("/auth/login")}
             className="flex-row items-center gap-2 px-6 py-3 rounded-full shadow-lg bg-emerald-500 active:scale-95"
           >
             <LogIn size={16} color="black" />
-            <Text className="text-sm font-bold text-black">로그인하기</Text>
+            <Text className="text-sm font-bold text-black">Login</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ paddingBottom: 130 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#10B981"
+              colors={["#10B981"]}
+            />
+          }
         >
           {isLoading && users.length === 0 ? (
             <View className="items-center justify-center py-12">
@@ -100,7 +123,7 @@ export default function ChatListScreen() {
           ) : filteredUsers.length === 0 ? (
             <View className="items-center py-16">
               <Text className="text-xs text-zinc-500">
-                활동 중인 친구가 없습니다.
+                No friends are currently active.
               </Text>
             </View>
           ) : (
@@ -110,7 +133,7 @@ export default function ChatListScreen() {
                 const isOnline = onlineUsers.includes(friend.clerkId);
                 const isListening =
                   isOnline && activityInfo?.status === "Listening";
-                const statusText = isOnline ? "온라인" : "오프라인";
+                const statusText = isOnline ? "Online" : "Offline";
                 const currentSong = isListening ? activityInfo.activity : null;
                 const isUnread = unreadUsers.includes(friend._id); // 읽지 않은 메시지 뱃지 여부
 
@@ -189,7 +212,11 @@ export default function ChatListScreen() {
                     {/* Chat Action Icon */}
                     <View className="p-1">
                       {isUnread ? (
-                        <Send size={18} color="white" className="animate-pulse" />
+                        <Send
+                          size={18}
+                          color="white"
+                          className="animate-pulse"
+                        />
                       ) : (
                         <MessageSquare size={18} color="#4B5563" />
                       )}

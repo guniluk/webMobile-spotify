@@ -6,7 +6,6 @@ import * as AuthSession from "expo-auth-session";
 import { Music4 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 
-
 // WebBrowser warm up hook for better performance and session control
 function useWarmUpBrowser() {
   React.useEffect(() => {
@@ -28,8 +27,6 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-
-
       // AuthSession.makeRedirectUri를 사용하여 Expo Go와 빌드 환경 모두에 호환되는 올바른 리디렉트 URL을 얻습니다.
       const redirectUrl = AuthSession.makeRedirectUri({
         path: "sso-callback",
@@ -57,19 +54,19 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 bg-[#121212] items-center justify-center p-6">
       {/* Spotify Metaphor Icon */}
-      <View className="relative mb-8 items-center">
-        <View className="absolute w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl" />
-        <View className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-full flex items-center justify-center shadow-lg">
-          <Music4 size={40} className="text-emerald-500" />
+      <View className="relative items-center mb-8">
+        <View className="absolute w-24 h-24 rounded-full bg-yellow-500/30 blur-xl" />
+        <View className="flex items-center justify-center w-20 h-20 border-2 rounded-full shadow-lg bg-zinc-900 border-yellow-500/40">
+          <Music4 size={40} color="#FBBF24" />
         </View>
       </View>
 
-      <Text className="text-white text-2xl font-black mb-2 tracking-tight text-center">
+      <Text className="mb-2 text-2xl font-black tracking-tight text-center text-white">
         Spotify Music Hub
       </Text>
-      
+
       <Text className="text-zinc-400 text-sm text-center max-w-[280px] leading-relaxed mb-10">
-        로그인하여 나만의 플레이리스트를 즐기고, 실시간으로 친구들과 연결해 보세요.
+        Enjoy Music & Chat! by logging in with your account.
       </Text>
 
       {/* Google Login Button */}
@@ -81,11 +78,13 @@ export default function LoginScreen() {
         }`}
       >
         <Image
-          source={{ uri: "https://cdn-icons-png.flaticon.com/512/2991/2991148.png" }}
+          source={{
+            uri: "https://cdn-icons-png.flaticon.com/512/2991/2991148.png",
+          }}
           style={{ width: 18, height: 18, marginRight: 10, tintColor: "black" }}
         />
-        <Text className="text-black font-bold text-base">
-          {isLoading ? "로그인 중..." : "Google 계정으로 계속하기"}
+        <Text className="text-base font-bold text-black">
+          {isLoading ? "Login..." : "Continue with Google"}
         </Text>
       </TouchableOpacity>
 
@@ -93,13 +92,12 @@ export default function LoginScreen() {
       <TouchableOpacity
         onPress={() => router.replace("/(tabs)")}
         disabled={isLoading}
-        className="mt-6 py-2"
+        className="py-2 mt-6"
       >
-        <Text className="text-zinc-500 hover:text-zinc-300 text-xs font-semibold underline">
-          비회원으로 둘러보기
+        <Text className="text-xs font-semibold underline text-zinc-500 hover:text-zinc-300">
+          Browse as guest
         </Text>
       </TouchableOpacity>
     </View>
   );
 }
-

@@ -55,7 +55,7 @@ interface MusicStore {
   createAlbum: (formData: FormData) => Promise<void>;
 }
 
-export const useMusicStore = create<MusicStore>((set) => ({
+export const useMusicStore = create<MusicStore>((set, get) => ({
   songs: [],
   albums: [],
   featuredSongs: [],
@@ -147,6 +147,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
       set((state) => ({
         songs: state.songs.filter((song) => song._id !== id),
       }));
+      await get().fetchStats();
     } catch (error) {
       set({ error: getErrorMessage(error, "Failed to delete song") });
     } finally {
@@ -161,6 +162,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
       set((state) => ({
         albums: state.albums.filter((album) => album._id !== id),
       }));
+      await get().fetchStats();
     } catch (error) {
       set({ error: getErrorMessage(error, "Failed to delete album") });
     } finally {
@@ -191,6 +193,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
       set((state) => ({
         songs: [...state.songs, response.data],
       }));
+      await get().fetchStats();
     } catch (error) {
       set({ error: getErrorMessage(error, "Failed to create song") });
     } finally {
@@ -209,6 +212,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
       set((state) => ({
         albums: [...state.albums, response.data],
       }));
+      await get().fetchStats();
     } catch (error) {
       set({ error: getErrorMessage(error, "Failed to create album") });
     } finally {

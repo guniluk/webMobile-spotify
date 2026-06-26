@@ -80,7 +80,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
         await Audio.setAudioModeAsync({
           playsInSilentModeIOS: true,
           staysActiveInBackground: true,
-          shouldRouteThroughEarpieceAndroid: false,
+          playThroughEarpieceAndroid: false,
         });
 
         const { sound } = await Audio.Sound.createAsync(

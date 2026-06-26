@@ -34,15 +34,17 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "홈",
+            title: "Home",
             tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
           }}
         />
         <Tabs.Screen
           name="chat"
           options={{
-            title: "채팅",
-            tabBarIcon: ({ color, size }) => <MessageSquare color={color} size={size} />,
+            title: "Chat",
+            tabBarIcon: ({ color, size }) => (
+              <MessageSquare color={color} size={size} />
+            ),
             tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
             tabBarBadgeStyle: {
               backgroundColor: "#10B981",

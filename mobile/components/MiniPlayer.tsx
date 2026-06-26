@@ -9,11 +9,19 @@ interface MiniPlayerProps {
 }
 
 export default function MiniPlayer({ bottomOffset = 60 }: MiniPlayerProps) {
-  const { currentSong, isPlaying, togglePlay, playNext, playPrevious, progress } = usePlayerStore();
+  const {
+    currentSong,
+    isPlaying,
+    togglePlay,
+    playNext,
+    playPrevious,
+    progress,
+  } = usePlayerStore();
 
   if (!currentSong) return null;
 
-  const progressRatio = progress.duration > 0 ? progress.position / progress.duration : 0;
+  const progressRatio =
+    progress.duration > 0 ? progress.position / progress.duration : 0;
 
   // 재생 경과 시간 포맷 (분:초)
   const formatTime = (ms: number) => {
@@ -24,8 +32,8 @@ export default function MiniPlayer({ bottomOffset = 60 }: MiniPlayerProps) {
   };
 
   return (
-    <View 
-      className="absolute left-2 right-2 bg-zinc-900 border border-zinc-800/80 rounded-xl p-3 flex-column shadow-2xl shadow-black/80 z-50"
+    <View
+      className="absolute z-50 p-3 border shadow-2xl left-2 right-2 bg-zinc-700 border-zinc-800/80 rounded-xl flex-column shadow-black/80"
       style={{ bottom: bottomOffset }}
     >
       {/* Upper Layout: Details and Control buttons */}
@@ -33,17 +41,22 @@ export default function MiniPlayer({ bottomOffset = 60 }: MiniPlayerProps) {
         <View className="flex-row items-center flex-1 mr-4">
           {/* Album Artwork */}
           <Image
-            source={currentSong.imageUrl ? { uri: currentSong.imageUrl } : undefined}
+            source={
+              currentSong.imageUrl ? { uri: currentSong.imageUrl } : undefined
+            }
             className="rounded-md bg-zinc-800"
             style={{ width: 40, height: 40 }}
           />
-          
+
           {/* Track details */}
-          <View className="ml-3 flex-1">
-            <Text numberOfLines={1} className="text-white text-xs font-bold">
+          <View className="flex-1 ml-3">
+            <Text numberOfLines={1} className="text-xs font-bold text-white">
               {currentSong.title}
             </Text>
-            <Text numberOfLines={1} className="text-zinc-400 text-[10px] mt-0.5">
+            <Text
+              numberOfLines={1}
+              className="text-zinc-400 text-[10px] mt-0.5"
+            >
               {currentSong.artist}
             </Text>
           </View>
@@ -60,7 +73,7 @@ export default function MiniPlayer({ bottomOffset = 60 }: MiniPlayerProps) {
 
           <TouchableOpacity
             onPress={() => togglePlay()}
-            className="bg-white rounded-full items-center justify-center active:scale-90"
+            className="items-center justify-center bg-white rounded-full active:scale-90"
             style={{ width: 32, height: 32 }}
           >
             {isPlaying ? (
@@ -81,14 +94,18 @@ export default function MiniPlayer({ bottomOffset = 60 }: MiniPlayerProps) {
 
       {/* Lower Layout: Progress Bar */}
       <View className="mt-2.5 flex-row items-center justify-between">
-        <Text className="text-zinc-500 text-[8px] font-semibold">{formatTime(progress.position)}</Text>
+        <Text className="text-zinc-500 text-[8px] font-semibold">
+          {formatTime(progress.position)}
+        </Text>
         <View className="flex-1 h-[2.5px] bg-zinc-800 rounded-full mx-2 overflow-hidden">
           <View
             className="h-full bg-emerald-500"
             style={{ width: `${Math.min(100, progressRatio * 100)}%` }}
           />
         </View>
-        <Text className="text-zinc-500 text-[8px] font-semibold">{formatTime(progress.duration)}</Text>
+        <Text className="text-zinc-500 text-[8px] font-semibold">
+          {formatTime(progress.duration)}
+        </Text>
       </View>
     </View>
   );

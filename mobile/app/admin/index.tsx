@@ -311,13 +311,13 @@ export default function AdminScreen() {
       >
         {/* 2. Stats Grid */}
         <Text className="mb-3 text-base font-bold text-white">
-          전체 통계 개요
+          Music Statistics
         </Text>
         <View className="flex-row flex-wrap justify-between mb-6 gap-y-3">
           <View className="w-[48%] bg-zinc-900/60 p-4 rounded-xl border border-zinc-800 flex-row items-center gap-3">
             <Music size={20} color="#10B981" />
             <View>
-              <Text className="text-[10px] text-zinc-400">총 곡 수</Text>
+              <Text className="text-[10px] text-zinc-400">Total Songs</Text>
               <Text className="text-base font-black text-white">
                 {stats?.totalSongs ?? 0}
               </Text>
@@ -326,7 +326,7 @@ export default function AdminScreen() {
           <View className="w-[48%] bg-zinc-900/60 p-4 rounded-xl border border-zinc-800 flex-row items-center gap-3">
             <Disc size={20} color="#10B981" />
             <View>
-              <Text className="text-[10px] text-zinc-400">총 앨범 수</Text>
+              <Text className="text-[10px] text-zinc-400">Total Albums</Text>
               <Text className="text-base font-black text-white">
                 {stats?.totalAlbums ?? 0}
               </Text>
@@ -335,7 +335,7 @@ export default function AdminScreen() {
           <View className="w-[48%] bg-zinc-900/60 p-4 rounded-xl border border-zinc-800 flex-row items-center gap-3">
             <Users size={20} color="#10B981" />
             <View>
-              <Text className="text-[10px] text-zinc-400">총 사용자 수</Text>
+              <Text className="text-[10px] text-zinc-400">Total Users</Text>
               <Text className="text-base font-black text-white">
                 {stats?.totalUsers ?? 0}
               </Text>
@@ -344,7 +344,7 @@ export default function AdminScreen() {
           <View className="w-[48%] bg-zinc-900/60 p-4 rounded-xl border border-zinc-800 flex-row items-center gap-3">
             <Database size={20} color="#10B981" />
             <View>
-              <Text className="text-[10px] text-zinc-400">아티스트 수</Text>
+              <Text className="text-[10px] text-zinc-400">Unique Artists</Text>
               <Text className="text-base font-black text-white">
                 {stats?.uniqueArtists ?? 0}
               </Text>
@@ -363,7 +363,7 @@ export default function AdminScreen() {
             <Text
               className={`text-xs font-bold ${activeTab === "songs" ? "text-black" : "text-zinc-400"}`}
             >
-              음악 관리
+              Song Mgmt.
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -375,7 +375,7 @@ export default function AdminScreen() {
             <Text
               className={`text-xs font-bold ${activeTab === "albums" ? "text-black" : "text-zinc-400"}`}
             >
-              앨범 관리
+              Album Mgmt.
             </Text>
           </TouchableOpacity>
         </View>
@@ -385,7 +385,7 @@ export default function AdminScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-sm font-bold text-white">
-                노래 목록 ({songs.length}곡)
+                Song List ({songs.length} songs)
               </Text>
               <TouchableOpacity
                 onPress={() => setIsSongModalOpen(true)}
@@ -393,7 +393,7 @@ export default function AdminScreen() {
               >
                 <Plus size={14} color="black" />
                 <Text className="ml-1 text-xs font-bold text-black">
-                  곡 추가
+                  Add Song
                 </Text>
               </TouchableOpacity>
             </View>
@@ -423,7 +423,7 @@ export default function AdminScreen() {
                       <View className="flex-1">
                         <Text
                           numberOfLines={1}
-                          className="text-xs font-bold text-white"
+                          className="ml-2 text-xs font-bold text-white"
                         >
                           {song.title}
                         </Text>
@@ -450,7 +450,7 @@ export default function AdminScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-sm font-bold text-white">
-                앨범 목록 ({albums.length}개)
+                Album List ({albums.length} albums)
               </Text>
               <TouchableOpacity
                 onPress={() => setIsAlbumModalOpen(true)}
@@ -458,7 +458,7 @@ export default function AdminScreen() {
               >
                 <Plus size={14} color="black" />
                 <Text className="ml-1 text-xs font-bold text-black">
-                  앨범 추가
+                  Add Album
                 </Text>
               </TouchableOpacity>
             </View>
@@ -488,7 +488,7 @@ export default function AdminScreen() {
                       <View className="flex-1">
                         <Text
                           numberOfLines={1}
-                          className="text-xs font-bold text-white"
+                          className="ml-2 text-xs font-bold text-white"
                         >
                           {album.title}
                         </Text>
@@ -525,15 +525,15 @@ export default function AdminScreen() {
         <View className="items-center justify-center flex-1 px-4 bg-black/80">
           <View className="w-full max-h-[85%] bg-zinc-950 border border-zinc-900 p-6 rounded-2xl">
             <Text className="mb-4 text-base font-black text-white">
-              새로운 음원 추가
+              Add New Song
             </Text>
 
             <ScrollView className="mb-4">
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                곡 제목 *
+                Song Title *
               </Text>
               <TextInput
-                placeholder="제목을 입력하세요"
+                placeholder="Enter the title"
                 placeholderTextColor="#4B5563"
                 value={songTitle}
                 onChangeText={setSongTitle}
@@ -541,10 +541,10 @@ export default function AdminScreen() {
               />
 
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                아티스트 *
+                Artist *
               </Text>
               <TextInput
-                placeholder="아티스트명을 입력하세요"
+                placeholder="Enter the artist name"
                 placeholderTextColor="#4B5563"
                 value={songArtist}
                 onChangeText={setSongArtist}
@@ -552,10 +552,10 @@ export default function AdminScreen() {
               />
 
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                재생 시간 (초) *
+                Duration (seconds) *
               </Text>
               <TextInput
-                placeholder="예: 210 (초 단위)"
+                placeholder="e.g., 210 (seconds)"
                 placeholderTextColor="#4B5563"
                 value={songDuration}
                 onChangeText={setSongDuration}
@@ -564,7 +564,7 @@ export default function AdminScreen() {
               />
 
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                소속 앨범 (선택)
+                Album (Optional)
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
                 <TouchableOpacity
@@ -578,7 +578,7 @@ export default function AdminScreen() {
                   <Text
                     className={`text-[10px] font-bold ${selectedAlbumId === "" ? "text-emerald-400" : "text-zinc-400"}`}
                   >
-                    싱글 (앨범 없음)
+                    Single (No Album)
                   </Text>
                 </TouchableOpacity>
                 {albums.map((album) => (
@@ -602,7 +602,7 @@ export default function AdminScreen() {
 
               {/* 이미지 파일 피커 */}
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                커버 이미지 업로드 *
+                Cover Image Upload *
               </Text>
               <TouchableOpacity
                 onPress={() => pickImage("song")}
@@ -610,7 +610,7 @@ export default function AdminScreen() {
               >
                 <ImageIcon size={16} color="#9CA3AF" />
                 <Text className="ml-2 text-xs font-semibold text-zinc-400">
-                  {songImage ? "이미지 선택 완료" : "커버 아트 선택"}
+                  {songImage ? "Image selected" : "Select Cover Art"}
                 </Text>
               </TouchableOpacity>
               {songImage && (
@@ -625,7 +625,7 @@ export default function AdminScreen() {
 
               {/* 오디오 파일 피커 */}
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                음원 파일 업로드 (.mp3 등) *
+                Audio File Upload (.mp3, etc.) *
               </Text>
               <TouchableOpacity
                 onPress={pickAudio}
@@ -633,7 +633,7 @@ export default function AdminScreen() {
               >
                 <FileAudio size={16} color="#9CA3AF" />
                 <Text className="ml-2 text-xs font-semibold text-zinc-400">
-                  {songAudio ? songAudio.name : "음원 파일 선택"}
+                  {songAudio ? "File selected" : "Select Audio File"}
                 </Text>
               </TouchableOpacity>
             </ScrollView>
@@ -645,7 +645,7 @@ export default function AdminScreen() {
                 disabled={isSubmitting}
                 className="items-center flex-1 py-3 border rounded-full bg-zinc-900 border-zinc-800"
               >
-                <Text className="text-xs font-bold text-zinc-400">취소</Text>
+                <Text className="text-xs font-bold text-zinc-400">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleAddSong}
@@ -655,9 +655,7 @@ export default function AdminScreen() {
                 {isSubmitting ? (
                   <ActivityIndicator color="black" size="small" />
                 ) : (
-                  <Text className="text-xs font-bold text-black">
-                    추가 완료
-                  </Text>
+                  <Text className="text-xs font-bold text-black">Add Song</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -675,15 +673,15 @@ export default function AdminScreen() {
         <View className="items-center justify-center flex-1 px-4 bg-black/80">
           <View className="w-full p-6 border bg-zinc-950 border-zinc-900 rounded-2xl">
             <Text className="mb-4 text-base font-black text-white">
-              새로운 앨범 추가
+              Add new Album
             </Text>
 
             <ScrollView className="mb-4">
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                앨범 제목 *
+                Title *
               </Text>
               <TextInput
-                placeholder="제목을 입력하세요"
+                placeholder="input title"
                 placeholderTextColor="#4B5563"
                 value={albumTitle}
                 onChangeText={setAlbumTitle}
@@ -691,10 +689,10 @@ export default function AdminScreen() {
               />
 
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                아티스트 *
+                Artist *
               </Text>
               <TextInput
-                placeholder="아티스트명을 입력하세요"
+                placeholder="input artist"
                 placeholderTextColor="#4B5563"
                 value={albumArtist}
                 onChangeText={setAlbumArtist}
@@ -702,10 +700,10 @@ export default function AdminScreen() {
               />
 
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                발매 연도 *
+                Release Year *
               </Text>
               <TextInput
-                placeholder="예: 2026"
+                placeholder="input year"
                 placeholderTextColor="#4B5563"
                 value={albumYear}
                 onChangeText={setAlbumYear}
@@ -715,7 +713,7 @@ export default function AdminScreen() {
 
               {/* 이미지 파일 피커 */}
               <Text className="mb-1 text-xs font-bold text-zinc-400">
-                커버 이미지 업로드 *
+                Cover Image Upload *
               </Text>
               <TouchableOpacity
                 onPress={() => pickImage("album")}
@@ -723,7 +721,7 @@ export default function AdminScreen() {
               >
                 <ImageIcon size={16} color="#9CA3AF" />
                 <Text className="ml-2 text-xs font-semibold text-zinc-400">
-                  {albumImage ? "이미지 선택 완료" : "커버 아트 선택"}
+                  {albumImage ? "Image selected" : "Select Cover Art"}
                 </Text>
               </TouchableOpacity>
               {albumImage && (
@@ -744,7 +742,7 @@ export default function AdminScreen() {
                 disabled={isSubmitting}
                 className="items-center flex-1 py-3 border rounded-full bg-zinc-900 border-zinc-800"
               >
-                <Text className="text-xs font-bold text-zinc-400">취소</Text>
+                <Text className="text-xs font-bold text-zinc-400">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleAddAlbum}
@@ -755,7 +753,7 @@ export default function AdminScreen() {
                   <ActivityIndicator color="black" size="small" />
                 ) : (
                   <Text className="text-xs font-bold text-black">
-                    생성 완료
+                    Create Album
                   </Text>
                 )}
               </TouchableOpacity>
